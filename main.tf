@@ -1,8 +1,22 @@
-provider "aws" {
-  region = "us-east-1"
+module "autoscaling" {
+  source      = "./modules/autoscaling"
+  namespace   = var.namespace
+  ssh_keypair = var.ssh_keypair
+
+  vpc       = module.networking.vpc
+  sg        = module.networking.sg
+  db_config = module.database.db_config
 }
 
-resource "aws_instance" "helloworld" {
-  ami           = "ami-0cebb45b34604efb8"
-  instance_type = "t2.micro"
+module "database" {
+  source    = "./modules/database"
+  namespace = var.namespace
+
+  vpc = module.networking.vpc
+  sg  = module.networking.sg
+}
+
+module "networking" {
+  source    = "./modules/networking"
+  namespace = var.namespace
 }
